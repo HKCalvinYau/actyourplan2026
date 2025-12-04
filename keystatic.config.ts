@@ -2,17 +2,13 @@ import { config, fields, collection } from '@keystatic/core'
 
 export default config({
   storage: {
-    kind: 'local',
+    kind: 'github',
+    repo: {
+      owner: 'HKCalvinYau',
+      name: 'actyourplan2026',
+    },
+    pathPrefix: 'content',
   },
-  // 如果部署到 Cloudflare Pages，請使用以下設定：
-  // storage: {
-  //   kind: 'github',
-  //   repo: {
-  //     owner: 'YOUR_GITHUB_USERNAME',
-  //     name: 'YOUR_REPO_NAME',
-  //   },
-  //   pathPrefix: 'content',
-  // },
   collections: {
     // Tags 管理系統
     tags: collection({
