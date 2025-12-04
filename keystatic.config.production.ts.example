@@ -1,0 +1,18 @@
+// 這是生產環境的 Keystatic 配置範例
+// 部署到 Cloudflare Pages 時，請將此配置複製到 keystatic.config.ts
+
+import { config, fields, collection } from '@keystatic/core'
+
+export default config({
+  storage: {
+    kind: 'github',
+    repo: {
+      owner: 'YOUR_GITHUB_USERNAME',  // 替換為您的 GitHub 用戶名
+      name: 'YOUR_REPO_NAME',        // 替換為您的 Repository 名稱
+    },
+    pathPrefix: 'content',
+  },
+  // 注意：需要在 Cloudflare Pages 環境變數中設定 KEYSTATIC_GITHUB_TOKEN
+  // 其他 collections 配置保持不變...
+})
+
