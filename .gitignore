@@ -48,3 +48,8 @@ next-env.d.ts
 # OS
 .DS_Store
 Thumbs.db
+
+# Security - GitHub Token (不要推送這個文件！)
+gittoken.md
+*.token
+*.key
