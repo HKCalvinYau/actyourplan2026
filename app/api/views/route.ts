@@ -3,6 +3,10 @@ import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
 
+// 注意：此 API 使用 fs，在 Cloudflare Edge Runtime 中可能無法正常工作
+// 如果需要，可以改為使用 GitHub API 或數據庫
+export const runtime = 'nodejs' // 使用 Node.js runtime 以支援 fs
+
 // 內容類型
 type ContentType = 'blueprints' | 'armory' | 'signals' | 'experiments'
 

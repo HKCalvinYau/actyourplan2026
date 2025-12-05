@@ -117,3 +117,4 @@ module.exports = nextConfig
 
 如果使用 API 路由（您的專案有 `/api` 路由），必須使用 **方案 2**（Cloudflare Next.js 適配器），因為 Cloudflare Pages 需要特殊配置才能支援 Next.js API 路由。
 
+
