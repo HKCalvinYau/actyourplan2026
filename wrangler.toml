@@ -1,0 +1,10 @@
+name = "actyourplan2026"
+compatibility_date = "2025-12-05"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist" # Astro 預設是 dist，之前是 .vercel/...
+
+# Cloudflare D1 資料庫綁定
+[[d1_databases]]
+binding = "DB" # 程式碼裡用這個名字 (env.DB)
+database_name = "the-base-db"
+database_id = "ae8ccc66-72c7-4142-8026-5497ba9b44c4"

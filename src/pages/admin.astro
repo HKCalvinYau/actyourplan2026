@@ -1,0 +1,80 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// 簡單的密碼保護 (Cloudflare Function 環境變數)
+const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || 'admin123';
+
+// 處理表單提交 (Server Side)
+if (Astro.request.method === 'POST') {
+  try {
+    const data = await Astro.request.formData();
+    const password = data.get('password');
+    
+    if (password !== ADMIN_PASSWORD) {
+      throw new Error('密碼錯誤');
+    }
+
+    const title = data.get('title') as string;
+    const type = data.get('type') as any;
+    const content = data.get('content') as string;
+    const slug = title.toLowerCase().replace(/\s+/g, '-'); // 簡單 slug 生成
+
+    // 取得 D1 資料庫 (從 Astro locals)
+    const { DB } = Astro.locals.runtime.env;
+
+    await DB.prepare(
+      'INSERT INTO posts (slug, type, title, content, metadata, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    ).bind(
+      slug,
+      type,
+      title,
+      content,
+      JSON.stringify({}), // 暫時空 metadata
+      Date.now(),
+      Date.now()
+    ).run();
+
+    return Astro.redirect(`/${type}`);
+  } catch (error) {
+    console.error(error);
+  }
+}
+---
+
+<Layout title="Admin | THE BASE">
+  <div class="max-w-2xl mx-auto p-8">
+    <h1 class="text-3xl font-mono font-bold text-primary mb-8">COMMAND CENTER</h1>
+    
+    <form method="POST" class="space-y-6">
+      <div>
+        <label class="block text-sm font-mono text-text-muted mb-2">ACCESS CODE</label>
+        <input type="password" name="password" required class="w-full bg-surface border border-border p-2 text-text-main" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-mono text-text-muted mb-2">TYPE</label>
+        <select name="type" class="w-full bg-surface border border-border p-2 text-text-main">
+          <option value="blueprints">BLUEPRINTS</option>
+          <option value="armory">ARMORY</option>
+          <option value="signals">SIGNALS</option>
+          <option value="experiments">EXPERIMENTS</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-mono text-text-muted mb-2">TITLE</label>
+        <input type="text" name="title" required class="w-full bg-surface border border-border p-2 text-text-main" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-mono text-text-muted mb-2">CONTENT (Markdown)</label>
+        <textarea name="content" rows="10" required class="w-full bg-surface border border-border p-2 text-text-main font-mono"></textarea>
+      </div>
+
+      <button type="submit" class="w-full bg-primary text-background font-bold py-3 hover:bg-primary/90">
+        [ DEPLOY INTEL ]
+      </button>
+    </form>
+  </div>
+</Layout>
+

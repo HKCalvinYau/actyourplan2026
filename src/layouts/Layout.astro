@@ -1,0 +1,72 @@
+---
+import '../styles/globals.css';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+const { 
+  title = 'THE BASE',
+  description = '建立你的基地。執行你的計畫。Digital Survival Protocols. 亂世中的生存戰略與數位實驗室。',
+  image = '/images/og-default.jpg'
+} = Astro.props;
+
+// Google Fonts (取代 Next.js Font Optimization)
+// Astro 可以直接在 head 引入 CSS，或者用 @fontsource
+// 這裡我們用最簡單的 Google Fonts CDN 確保樣式一致
+---
+
+<!doctype html>
+<html lang="zh-TW" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={image} />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <title>{title}</title>
+  </head>
+  <body class="bg-background text-text-main font-mono antialiased min-h-screen flex flex-col">
+    <!-- 
+      client:load 告訴 Astro 這個 React 元件需要在客戶端執行 JS (例如手機版 Menu) 
+    -->
+    <Header client:load />
+    
+    <main class="flex-grow">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>
+
+<style is:global>
+  /* 定義字體變數以配合 Tailwind */
+  :root {
+    --font-inter: 'Inter', sans-serif;
+    --font-jetbrains-mono: 'JetBrains Mono', monospace;
+  }
+</style>
+

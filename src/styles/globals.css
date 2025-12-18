@@ -1,0 +1,323 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 引入字體 */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* 程式碼高亮樣式（深色主題） */
+.hljs {
+  background: #171717 !important;
+  color: #e5e5e5 !important;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name {
+  color: #22c55e !important;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section,
+.hljs-attribute {
+  color: #fbbf24 !important;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #737373 !important;
+  font-style: italic;
+}
+
+.hljs-number {
+  color: #60a5fa !important;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-text-main font-body;
+    /* 網格線背景效果 */
+    background-image: 
+      linear-gradient(to right, rgba(34, 197, 94, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(34, 197, 94, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    /* 確保背景覆蓋整個視窗 */
+    min-height: 100vh;
+  }
+  
+  /* 標題樣式：Inter, Bold, Uppercase */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold uppercase;
+  }
+}
+
+@layer components {
+  /* 戰術按鈕樣式：方形、粗邊框、Hover 效果 */
+  .btn-tactical {
+    @apply px-6 py-3 border-2 border-primary bg-transparent text-primary font-mono font-semibold uppercase tracking-wider;
+    @apply transition-all duration-200;
+    @apply hover:bg-primary hover:text-background hover:shadow-[0_0_10px_rgba(34,197,94,0.5)];
+    @apply active:scale-95;
+  }
+  
+  .btn-tactical-primary {
+    @apply bg-primary text-background border-primary;
+    @apply hover:bg-transparent hover:text-primary;
+    @apply hover:shadow-[0_0_15px_rgba(34,197,94,0.7)];
+  }
+  
+  /* Glitch 效果（可選，用於特殊按鈕） */
+  .btn-glitch {
+    @apply relative;
+  }
+  
+  .btn-glitch:hover::before,
+  .btn-glitch:hover::after {
+    content: attr(data-text);
+    @apply absolute inset-0;
+  }
+  
+  .btn-glitch:hover::before {
+    @apply text-primary;
+    animation: glitch-1 0.3s infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  }
+  
+  .btn-glitch:hover::after {
+    @apply text-primary;
+    animation: glitch-2 0.3s infinite;
+    clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+  }
+}
+
+@layer utilities {
+  /* 自訂工具類 */
+  .text-tactical-green {
+    @apply text-primary;
+  }
+  
+  .border-tactical {
+    @apply border-2 border-border;
+  }
+}
+
+/* Glitch 動畫 */
+@keyframes glitch-1 {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+}
+
+@keyframes glitch-2 {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(2px, 2px);
+  }
+  40% {
+    transform: translate(2px, -2px);
+  }
+  60% {
+    transform: translate(-2px, 2px);
+  }
+  80% {
+    transform: translate(-2px, -2px);
+  }
+}
+
+/* Hero 背景動畫 */
+@keyframes flow {
+  0%, 100% {
+    transform: translateY(0) scaleY(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-20px) scaleY(1.2);
+    opacity: 0.6;
+  }
+}
+
+@keyframes radar {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.2;
+  }
+}
+
+.animate-flow {
+  animation: flow 3s ease-in-out infinite;
+}
+
+.animate-flow-delay-1 {
+  animation: flow 4s ease-in-out infinite 1s;
+}
+
+.animate-flow-delay-2 {
+  animation: flow 5s ease-in-out infinite 2s;
+}
+
+.animate-radar {
+  animation: radar 8s linear infinite;
+}
+
+.animate-radar-fast {
+  animation: radar 6s linear infinite;
+}
+
+.animate-radar-faster {
+  animation: radar 4s linear infinite;
+}
+
+/* 閃爍游標動畫 */
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* MDX Prose 樣式 */
+.prose {
+  color: #e5e5e5;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  color: #22c55e;
+  font-family: var(--font-inter);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.prose h2 {
+  font-size: 1.875rem;
+  border-bottom: 2px solid #262626;
+  padding-bottom: 0.5rem;
+}
+
+.prose h3 {
+  font-size: 1.5rem;
+}
+
+.prose p {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+}
+
+.prose ul,
+.prose ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+.prose code {
+  background-color: #171717;
+  color: #22c55e;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.875em;
+}
+
+.prose pre {
+  background-color: #171717;
+  border: 2px solid #262626;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+  color: #e5e5e5;
+}
+
+.prose blockquote {
+  border-left: 4px solid #22c55e;
+  padding-left: 1rem;
+  margin-left: 0;
+  color: #737373;
+  font-style: italic;
+}
+
+.prose a {
+  color: #22c55e;
+  text-decoration: underline;
+}
+
+.prose a:hover {
+  color: #16a34a;
+}
+
+.prose strong {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+/* Marquee 動畫 */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee-content {
+  display: inline-flex;
+  gap: 2rem;
+  animation: marquee 20s linear infinite;
+}
+
