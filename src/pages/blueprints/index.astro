@@ -1,0 +1,116 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ArticleCard from '../../components/ArticleCard';
+import Pagination from '../../components/Pagination'; // 需要確認 Pagination 是否相容
+import { getPosts, type Post } from '../../lib/d1';
+
+// 1. 獲取資料
+let posts: any[] = [];
+try {
+  if (Astro.locals.runtime?.env?.DB) {
+    const dbPosts = await getPosts(Astro.locals.runtime.env.DB, 'blueprints');
+    
+    // 解析 metadata 並整理格式
+    posts = dbPosts.map(post => {
+      const meta = JSON.parse(post.metadata || '{}');
+      return {
+        ...post,
+        ...meta,
+        date: new Date(post.created_at).toISOString(),
+        contentType: post.type
+      };
+    });
+  }
+} catch (e) {
+  console.error('Error fetching blueprints:', e);
+}
+
+// 2. 分頁處理 (簡單版)
+const currentPage = 1; // 暫時寫死，進階分頁需要處理 URLSearchParams
+const totalPages = 1;
+---
+
+<Layout title="Blueprints | THE BASE">
+  <div class="min-h-screen bg-background">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <!-- Page Header -->
+      <div class="mb-12">
+        <h1 class="text-4xl md:text-5xl font-heading font-bold uppercase mb-4 text-primary">
+          B. BLUEPRINTS
+        </h1>
+        <p class="text-text-muted font-mono text-lg">
+          戰略藍圖 - 解構經典書籍與商業模式
+        </p>
+      </div>
+
+      <!-- Header Text -->
+      <div class="mb-12 bg-surface border-2 border-border p-8">
+        <h2 class="text-2xl md:text-3xl font-mono font-bold uppercase mb-6 text-primary">
+          ARCHIVE: STRATEGIC KNOWLEDGE 戰略檔案室
+        </h2>
+        
+        <div class="font-mono text-text-main text-sm md:text-base leading-relaxed space-y-4 mb-8">
+          <p>
+            這裡不存放讀後感，只存放<strong class="text-primary">「可執行的代碼」</strong>。
+          </p>
+          <p>
+            身為現實世界的老闆 (CDR)，我習慣將書本裡的抽象理論，拆解成具體的商業 SOP。
+          </p>
+          <p>
+            這裡的每一份藍圖，都是我為了生存而提煉出的底層邏輯。
+          </p>
+        </div>
+
+        {/* How to Use */}
+        <div class="border-t-2 border-border pt-6">
+          <h3 class="font-mono font-bold uppercase mb-4 text-text-main">
+            [ HOW TO USE / 使用指南 ]
+          </h3>
+          <div class="space-y-3 font-mono text-sm text-text-muted">
+            <div class="flex items-start gap-3">
+              <span class="text-2xl flex-shrink-0">🔰</span>
+              <div>
+                <span class="text-text-main font-bold">PVT (新兵級):</span>{' '}
+                閱讀摘要，獲取靈感。
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-2xl flex-shrink-0">⭐️</span>
+              <div>
+                <span class="text-yellow-500 font-bold">CDR (指揮官級):</span>{' '}
+                直接下載文末的 Notion 模板，部署到你的人生系統中。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- List View -->
+      {posts.length === 0 ? (
+        <div class="bg-surface border-2 border-border p-8 text-center">
+          <p class="text-text-muted font-mono">
+            目前沒有文章
+          </p>
+        </div>
+      ) : (
+        <div class="bg-surface border-2 border-border">
+          <div class="divide-y divide-border">
+            {posts.map((post) => (
+              <div class="p-6">
+                <ArticleCard
+                  slug={post.slug}
+                  title={post.title}
+                  date={post.date}
+                  type="BLUEPRINTS"
+                  rank={post.rank || 'PVT'}
+                  href={`/blueprints/${post.slug}`}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+</Layout>
+

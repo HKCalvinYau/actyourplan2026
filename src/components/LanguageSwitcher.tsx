@@ -1,17 +1,25 @@
-'use client'
-
-import { usePathname, useRouter } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
-import { locales, localeNames, type Locale, getLocaleFromPath, removeLocaleFromPath } from '@/lib/i18n'
+import { locales, localeNames, type Locale, getLocaleFromPath, removeLocaleFromPath } from '../lib/i18n'
+import { useState, useEffect } from 'react'
 
 export default function LanguageSwitcher() {
-  const pathname = usePathname()
-  const router = useRouter()
-  const currentLocale = getLocaleFromPath(pathname)
-  const pathWithoutLocale = removeLocaleFromPath(pathname)
+  const [currentLocale, setCurrentLocale] = useState<Locale>('zh-TW')
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const pathname = window.location.pathname
+      setCurrentLocale(getLocaleFromPath(pathname))
+    }
+  }, [])
 
   const handleLanguageChange = (newLocale: Locale) => {
-    if (newLocale === currentLocale) return
+    if (typeof window === 'undefined') return
+    const pathname = window.location.pathname
+    const current = getLocaleFromPath(pathname)
+    
+    if (newLocale === current) return
+
+    const pathWithoutLocale = removeLocaleFromPath(pathname)
 
     // 構建新路徑
     let newPath = ''
@@ -23,7 +31,7 @@ export default function LanguageSwitcher() {
       newPath = `/${newLocale}${pathWithoutLocale || ''}`
     }
 
-    router.push(newPath)
+    window.location.href = newPath
   }
 
   return (
@@ -43,4 +51,3 @@ export default function LanguageSwitcher() {
     </div>
   )
 }
-

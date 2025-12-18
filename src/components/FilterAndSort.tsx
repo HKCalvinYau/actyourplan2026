@@ -1,7 +1,4 @@
-'use client'
-
-import { useTransition } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
 interface FilterAndSortProps {
   categories: Array<{ slug: string; name: string }>
@@ -10,31 +7,33 @@ interface FilterAndSortProps {
 }
 
 export default function FilterAndSort({ categories, tags, contentType }: FilterAndSortProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [, startTransition] = useTransition()
+  const [params, setParams] = useState<URLSearchParams | null>(null)
 
-  // 從 URL 參數獲取當前篩選和排序狀態
-  const currentCategory = searchParams.get('category') || ''
-  const currentRank = searchParams.get('rank') || ''
-  const currentTag = searchParams.get('tag') || ''
-  const currentSortBy = searchParams.get('sortBy') || 'date'
-  const currentSortOrder = searchParams.get('sortOrder') || 'desc'
+  useEffect(() => {
+    setParams(new URLSearchParams(window.location.search))
+  }, [])
 
-  // 更新 URL 參數
+  // 如果還沒拿到 URL 參數，就不顯示或顯示預設
+  if (!params) return null
+
+  const currentCategory = params.get('category') || ''
+  const currentRank = params.get('rank') || ''
+  const currentTag = params.get('tag') || ''
+  const currentSortBy = params.get('sortBy') || 'date'
+  const currentSortOrder = params.get('sortOrder') || 'desc'
+
   const updateParams = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const newParams = new URLSearchParams(window.location.search)
     if (value) {
-      params.set(key, value)
+      newParams.set(key, value)
     } else {
-      params.delete(key)
+      newParams.delete(key)
     }
-    // 重置頁碼到第一頁
-    params.delete('page')
+    // 重置頁碼
+    newParams.delete('page')
     
-    startTransition(() => {
-      router.push(`/${contentType}?${params.toString()}`)
-    })
+    // Astro 是 MPA，直接刷新頁面
+    window.location.href = `/${contentType}?${newParams.toString()}`
   }
 
   return (
@@ -126,12 +125,7 @@ export default function FilterAndSort({ categories, tags, contentType }: FilterA
         {(currentCategory || currentRank || currentTag) && (
           <button
             onClick={() => {
-              const params = new URLSearchParams()
-              if (currentSortBy !== 'date') params.set('sortBy', currentSortBy)
-              if (currentSortOrder !== 'desc') params.set('sortOrder', currentSortOrder)
-              startTransition(() => {
-                router.push(`/${contentType}?${params.toString()}`)
-              })
+              window.location.href = `/${contentType}`
             }}
             className="px-4 py-2 border border-border text-text-muted font-mono text-xs uppercase hover:border-primary hover:text-primary transition-colors"
           >

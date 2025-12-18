@@ -1,16 +1,292 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import BaseGrid from '../components/BaseGrid';
+import ArticleCard from '../components/ArticleCard';
+import { getPosts, type Post } from '../lib/d1';
 
+// 1. 從 D1 資料庫獲取文章
+let latestPosts: any[] = [];
+try {
+  // 注意：本地開發時可能還沒連到 D1，這裡做個防護
+  if (Astro.locals.runtime?.env?.DB) {
+    // 獲取所有類型的文章，然後混合排序
+    const types = ['blueprints', 'armory', 'signals', 'experiments'];
+    let allPosts: Post[] = [];
+    
+    for (const type of types) {
+      const posts = await getPosts(Astro.locals.runtime.env.DB, type);
+      allPosts = [...allPosts, ...posts];
+    }
+    
+    // 按日期排序 (最新的在前面)
+    latestPosts = allPosts
+      .sort((a, b) => b.created_at - a.created_at)
+      .slice(0, 3)
+      .map(post => {
+        // 解析 metadata
+        const meta = JSON.parse(post.metadata || '{}');
+        return {
+          ...post,
+          ...meta, // 把 metadata 展開 (rank, status 等)
+          date: new Date(post.created_at).toISOString(),
+          contentType: post.type
+        };
+      });
+  }
+} catch (e) {
+  console.error('Error fetching posts:', e);
+}
+
+// 輔助函式：轉換類型標籤
+const getTypeLabel = (contentType: string) => {
+  const typeMap: Record<string, string> = {
+    blueprints: 'BLUEPRINTS',
+    armory: 'ARMORY',
+    signals: 'SIGNALS',
+    experiments: 'EXPERIMENTS',
+  };
+  return typeMap[contentType] || contentType.toUpperCase();
+};
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout>
+  <!-- Section A: Hero (首屏) -->
+  <section class="relative min-h-[80vh] flex items-center justify-center bg-surface">
+    <!-- 網格線背景 -->
+    <div class="absolute inset-0 opacity-30 pointer-events-none">
+      <div 
+        class="w-full h-full"
+        style="background-image: linear-gradient(to right, rgba(34, 197, 94, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(34, 197, 94, 0.1) 1px, transparent 1px); background-size: 20px 20px;"
+      ></div>
+    </div>
+
+    <!-- 內容 -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-6 text-white leading-tight">
+        建立你的基地。執行你的計畫。
+        <br />
+        <span class="uppercase">BUILD YOUR BASE. ACT YOUR PLAN.</span>
+        <br class="hidden lg:block" />
+        <span class="hidden lg:inline text-4xl md:text-5xl lg:text-6xl">基地を築け。計画を実行せよ。</span>
+      </h1>
+
+      <div class="text-gray-400 font-mono text-lg md:text-xl mb-12 max-w-4xl mx-auto">
+        <p class="mb-2">
+          <strong>Digital Survival Protocols</strong>
+        </p>
+        <p>
+          這裡不是心靈雞湯。這是關於<strong class="text-primary">商業戰略</strong>、<strong class="text-primary">數位武裝</strong>與<strong class="text-primary">實戰藍圖</strong>的生存筆記。
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <button class="px-8 py-4 bg-primary text-background font-mono text-lg uppercase tracking-wider hover:bg-primary/90 transition-all duration-200 border-2 border-primary">
+          [ &gt; ENTER THE BASE (進入基地) ]
+        </button>
+        
+        <button class="px-8 py-4 border-2 border-primary bg-transparent text-primary font-mono text-lg uppercase tracking-wider hover:bg-primary hover:text-background transition-all duration-200">
+          [ VIEW PROTOCOLS (查看藍圖) ]
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 新增區塊 1: THE GLITCH -->
+  <section class="py-20 px-4 sm:px-6 lg:px-8 bg-background">
+    <div class="max-w-2xl mx-auto text-center">
+      <h2 class="text-2xl md:text-3xl font-mono font-bold uppercase mb-8 text-yellow-500">
+        SYSTEM DIAGNOSTIC: THE GLITCH
+      </h2>
+      <div class="font-mono text-text-main text-sm md:text-base leading-relaxed space-y-4">
+        <p>你是否有過這種感覺？</p>
+        <div class="space-y-2 text-text-muted">
+          <p>讀了 100 本書，卻依然原地踏步。</p>
+          <p>下載了無數工具，效率卻沒有提升。</p>
+          <p>腦中有完美的創業計畫，但遲遲沒有寫下第一行代碼。</p>
+        </div>
+        <p class="text-red-500 font-bold mt-6">
+          ERROR CODE: INACTION (行動癱瘓).
+        </p>
+        <p class="text-text-main mt-6">
+          本基地存在的唯一目的，就是修復這個 Bug。我們將「知識」編譯成「可執行的行動」。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section B: The B.A.S.E. Grid (核心功能矩陣) -->
+  <BaseGrid client:visible />
+
+  <!-- Section C: Latest Intel (最新訊號) -->
+  <section class="py-20 px-4 sm:px-6 lg:px-8 bg-background">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-heading font-bold uppercase mb-12 text-primary font-mono">
+        INCOMING TRANSMISSIONS (最新訊號)
+      </h2>
+
+      <!-- 終端機風格列表 -->
+      <div class="bg-surface border-2 border-border p-6 font-mono text-sm">
+        {latestPosts.length === 0 ? (
+          <div class="text-text-muted text-center py-8">
+            目前沒有文章
+          </div>
+        ) : (
+          <div class="space-y-3">
+            {latestPosts.map((post) => (
+              <ArticleCard
+                slug={post.slug}
+                title={post.title}
+                date={post.date}
+                type={getTypeLabel(post.contentType)}
+                rank={post.rank || 'PVT'}
+                href={`/${post.contentType}/${post.slug}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- 新增區塊 2: OPERATOR PROFILE -->
+  <section class="py-20 px-4 sm:px-6 lg:px-8 bg-neutral-900">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-2xl md:text-3xl font-mono font-bold uppercase mb-8 text-primary text-center">
+        OPERATOR ID: THE RECRUIT (新兵)
+      </h2>
+      
+      <div class="bg-surface border-2 border-border p-8 md:p-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+          <!-- Left Col: Stats -->
+          <div class="font-mono text-sm space-y-4">
+            <div class="border-b border-border pb-2">
+              <span class="text-text-muted">REAL WORLD RANK:</span>{' '}
+              <span class="text-text-main">Commander (老闆/實業家)</span>
+            </div>
+            <div class="border-b border-border pb-2">
+              <span class="text-text-muted">DIGITAL RANK:</span>{' '}
+              <span class="text-yellow-500">Private (二等兵/初學者)</span>
+            </div>
+            <div class="border-b border-border pb-2">
+              <span class="text-text-muted">WEAPON:</span>{' '}
+              <span class="text-primary">AI (My Exoskeleton)</span>
+            </div>
+            <div class="border-b border-border pb-2">
+              <span class="text-text-muted">STATUS:</span>{' '}
+              <span class="text-primary">Leveling Up...</span>
+            </div>
+          </div>
+
+          <!-- Right Col: Story -->
+          <div class="font-mono text-sm text-text-main leading-relaxed">
+            <p class="mb-4">
+              雖然我在現實世界經營生意多年，但在 IT 領域，我只是個剛入伍的新兵。
+            </p>
+            <p class="mb-4">
+              我本來不懂 IT，但我擅長「指揮」。
+            </p>
+            <p class="mb-4">
+              這個網站的所有代碼、功能，都是我指揮 AI (Gemini/Cursor) 完成的。
+            </p>
+            <p class="mb-4">
+              這裡沒有大師，只有一個努力從「二等兵」爬向「指揮官」的生存紀錄。
+            </p>
+            <p>
+              看著我如何用 AI 武裝自己，一步步建立數位基地。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 新增區塊 3: SECURE COMMS & SPECS -->
+  <section class="py-20 px-4 sm:px-6 lg:px-8 bg-background border-t-2 border-border">
+    <div class="max-w-4xl mx-auto">
+      <!-- Part A: Newsletter (Secure Comms) -->
+      <div class="mb-16 text-center">
+        <h2 class="text-2xl md:text-3xl font-mono font-bold uppercase mb-4 text-primary">
+          JOIN THE NETWORK
+        </h2>
+        <p class="font-mono text-text-muted text-sm mb-8">
+          每週發送一次情報週報 (SITREP)。不廢話，只有訊號。
+        </p>
+        
+        <!-- 終端機風格輸入框 -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-2xl mx-auto">
+          <div class="relative flex-1 w-full">
+            <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary font-mono text-sm">
+              &gt;
+            </span>
+            <input
+              type="email"
+              placeholder="ENTER EMAIL"
+              class="w-full pl-8 pr-4 py-3 bg-surface border-2 border-border text-text-main font-mono text-sm focus:border-primary focus:outline-none"
+            />
+            <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-primary font-mono animate-blink">
+              _
+            </span>
+          </div>
+          <button class="px-6 py-3 border-2 border-primary bg-transparent text-primary font-mono text-sm uppercase tracking-wider hover:bg-primary hover:text-background transition-all duration-200 whitespace-nowrap">
+            [ CONNECT ]
+          </button>
+        </div>
+      </div>
+
+      <!-- Part B: System Specs (Tech Stack Marquee) -->
+      <div class="border-t-2 border-border pt-12">
+        <p class="text-center font-mono text-text-muted text-xs uppercase mb-6 tracking-wider">
+          POWERED BY MODERN STACK
+        </p>
+        
+        <!-- Marquee 容器 -->
+        <div class="marquee-container">
+          <div class="marquee-content">
+            <!-- 第一組 -->
+            <span class="font-mono text-text-muted text-sm">NOTION</span>
+            <span class="font-mono text-text-muted text-sm">ASTRO</span>
+            <span class="font-mono text-text-muted text-sm">PYTHON</span>
+            <span class="font-mono text-text-muted text-sm">OBSIDIAN</span>
+            <span class="font-mono text-text-muted text-sm">TAILWIND</span>
+            <span class="font-mono text-text-muted text-sm">CLOUDFLARE</span>
+            <!-- 重複一組以實現無縫循環 -->
+            <span class="font-mono text-text-muted text-sm">NOTION</span>
+            <span class="font-mono text-text-muted text-sm">ASTRO</span>
+            <span class="font-mono text-text-muted text-sm">PYTHON</span>
+            <span class="font-mono text-text-muted text-sm">OBSIDIAN</span>
+            <span class="font-mono text-text-muted text-sm">TAILWIND</span>
+            <span class="font-mono text-text-muted text-sm">CLOUDFLARE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+  }
+  
+  .marquee-content {
+    display: inline-flex;
+    animation: marquee 20s linear infinite;
+    gap: 2rem;
+  }
+  
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  
+  .animate-blink {
+    animation: blink 1s step-end infinite;
+  }
+  
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+</style>

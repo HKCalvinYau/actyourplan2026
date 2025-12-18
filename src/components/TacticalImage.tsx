@@ -1,10 +1,7 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
+// import Image from 'next/image' // Astro 不使用 next/image
+import { useState } from 'react'
 import { ImageOff } from 'lucide-react'
-import { getOptimizedImageUrl } from '@/lib/image-cdn'
-import { preloadImage } from '@/lib/image-preload'
+import { getOptimizedImageUrl } from '../lib/image-cdn' 
 
 interface TacticalImageProps {
   src: string
@@ -12,6 +9,7 @@ interface TacticalImageProps {
   className?: string
   overlay?: boolean // 是否顯示綠色濾鏡覆蓋
   frame?: boolean // 是否顯示戰術邊框
+  priority?: boolean // Astro 這裡只當作普通 prop
 }
 
 export default function TacticalImage({
@@ -20,20 +18,14 @@ export default function TacticalImage({
   className = '',
   overlay = true,
   frame = true,
-  priority = false, // 是否優先載入
-}: TacticalImageProps & { priority?: boolean }) {
+  priority = false,
+}: TacticalImageProps) {
   const [imageError, setImageError] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
 
-  // 預加載圖片（如果設置了 priority）
-  useEffect(() => {
-    if (priority && src && !src.startsWith('http')) {
-      const optimizedSrc = getOptimizedImageUrl(src, { format: 'webp' })
-      preloadImage(optimizedSrc).catch(() => {
-        // 靜默處理錯誤
-      })
-    }
-  }, [priority, src])
+  // 簡單處理圖片路徑：如果不是 http 開頭，假設在 public/images/ 下，或者是相對路徑
+  // Astro public 資料夾的檔案可以直接用 /images/... 存取
+  const imgSrc = src.startsWith('http') ? src : src.startsWith('/') ? src : `/${src}`
 
   return (
     <div className={`relative ${frame ? 'p-4' : ''} ${className}`}>
@@ -83,35 +75,18 @@ export default function TacticalImage({
           </div>
         ) : (
           <>
-            {/* 圖片 - 使用 Next.js Image 組件優化（如果是外部圖片則使用 img） */}
-            {src.startsWith('http') ? (
-              <img
-                src={src}
-                alt={alt}
-                onError={() => setImageError(true)}
-                onLoad={() => setImageLoaded(true)}
-                className={`w-full h-auto transition-opacity duration-300 ${
-                  imageLoaded ? 'opacity-100' : 'opacity-0'
-                }`}
-                loading="lazy"
-              />
-            ) : (
-              <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-                <Image
-                  src={getOptimizedImageUrl(src, { format: 'webp' })}
-                  alt={alt}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className={`object-cover transition-opacity duration-300 ${
-                    imageLoaded ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  onError={() => setImageError(true)}
-                  onLoad={() => setImageLoaded(true)}
-                  loading={priority ? 'eager' : 'lazy'}
-                  priority={priority}
-                />
-              </div>
-            )}
+            {/* 圖片 - 使用標準 img 標籤 */}
+            <img
+              src={imgSrc}
+              alt={alt}
+              onError={() => setImageError(true)}
+              onLoad={() => setImageLoaded(true)}
+              className={`w-full h-auto object-cover transition-opacity duration-300 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              loading={priority ? 'eager' : 'lazy'}
+              style={{ aspectRatio: '16/9' }}
+            />
 
             {/* 載入中狀態 */}
             {!imageLoaded && !imageError && (
@@ -139,4 +114,3 @@ export default function TacticalImage({
     </div>
   )
 }
-

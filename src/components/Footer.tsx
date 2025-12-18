@@ -1,4 +1,4 @@
-import Link from 'next/link'
+// import Link from 'next/link'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -15,33 +15,33 @@ export default function Footer() {
 
           {/* Center: Social Links */}
           <div className="flex flex-wrap items-center justify-center gap-4 font-mono text-xs text-text-muted">
-            <Link
+            <a
               href="/rss"
               className="hover:text-primary transition-colors"
             >
               [ RSS FEED ]
-            </Link>
+            </a>
             <span className="text-border">|</span>
-            <Link
+            <a
               href="mailto:contact@example.com"
               className="hover:text-primary transition-colors"
             >
               [ EMAIL PROTOCOL ]
-            </Link>
+            </a>
             <span className="text-border">|</span>
-            <Link
+            <a
               href="https://twitter.com"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary transition-colors"
             >
               [ X / TWITTER ]
-            </Link>
+            </a>
           </div>
 
           {/* Right: Tech Stack */}
-          <div className="font-mono text-xs text-text-muted text-right">
-            <p>BUILT WITH [NEXT.JS].</p>
+          <div className="font-mono text-xs text-text-muted md:text-right">
+            <p>BUILT WITH [ASTRO v5].</p>
             <p>DEPLOYED ON [CLOUDFLARE PAGES].</p>
           </div>
         </div>
