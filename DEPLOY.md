@@ -194,6 +194,11 @@ npx wrangler pages deploy dist --project-name=actyourplan2026
 
 ## 疑難排解
 
+### 部署失敗（Deployment failed）
+
+- **若錯誤與 `Invalid binding SESSION` 有關**：專案已於 `wrangler.toml` 加入 SESSION 的 KV namespace 綁定，推送後重新部署即可。若使用 **Git 部署**，請到 Cloudflare Pages 專案 → **Settings** → **Functions** → **KV namespace bindings**，確認有 **Variable name**: `SESSION`、**KV namespace**: 選剛建立的 SESSION（或與 wrangler.toml 的 id 對應）。
+- **若為建置失敗**：在 Cloudflare Pages 專案 → **Settings** → **Environment variables** 設定 `NODE_VERSION` = `20` 或 `22`，再重新部署。
+
 ### 頁面只顯示 `[object Object]`
 
 - **可能原因**：環境或綁定與預期不符，導致某個物件被當成字串渲染。

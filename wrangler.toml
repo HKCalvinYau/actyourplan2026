@@ -8,3 +8,8 @@ pages_build_output_dir = "dist" # Astro 預設是 dist，之前是 .vercel/...
 binding = "DB" # 程式碼裡用這個名字 (env.DB)
 database_name = "the-base-db"
 database_id = "ae8ccc66-72c7-4142-8026-5497ba9b44c4"
+
+# Astro Cloudflare adapter 預設啟用 Session，需綁定 KV（避免部署時 Invalid binding SESSION）
+[[kv_namespaces]]
+binding = "SESSION"
+id = "28ff7cdf100b4f529394b3459c36092f"
