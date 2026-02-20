@@ -14,7 +14,7 @@ if (!type || !slug) {
 let post = null;
 try {
   // 注意：本地開發可能沒有 Astro.locals.runtime.env.DB，getPost 內部會處理 Mock 邏輯
-  post = await getPost(Astro.locals.runtime?.env?.DB, slug);
+  post = await getPost(Astro.locals?.runtime?.env?.DB ?? null, slug);
 } catch (e) {
   console.error('Error fetching post:', e);
 }
@@ -30,8 +30,9 @@ const contentHtml = await marked(post.content);
 const meta = JSON.parse(post.metadata || '{}');
 const tags = meta.tags || [];
 
-// 處理多語言
-const currentLocale = Astro.locals.locale || 'zh-TW';
+// 確保 locale 為字串
+const localeRaw = Astro.locals?.locale;
+const currentLocale = typeof localeRaw === 'string' ? localeRaw : 'zh-TW';
 const date = new Date(post.created_at).toLocaleDateString(currentLocale, {
   year: 'numeric',
   month: 'long',

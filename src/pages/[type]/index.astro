@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import ArticleCard from '../../components/ArticleCard';
 import { getPosts } from '../../lib/d1';
-import { getTranslations, getLocalePath, type Locale } from '../../lib/i18n';
+import { getTranslations, getLocalePath, defaultLocale } from '../../lib/i18n';
 
 const { type } = Astro.params;
 
@@ -12,33 +12,33 @@ if (!type || !validTypes.includes(type)) {
   return Astro.redirect('/404');
 }
 
-// 獲取當前語言
-const currentLocale = Astro.locals.locale || 'zh-TW';
+// 確保 locale 為字串，避免 [object Object]
+const localeRaw = Astro.locals?.locale;
+const currentLocale = typeof localeRaw === 'string' ? localeRaw : defaultLocale;
 const t = getTranslations(currentLocale);
-const sectionInfo = t.sections[type as keyof typeof t.sections];
+const sectionInfoRaw = t.sections?.[type as keyof typeof t.sections];
+const sectionInfo = sectionInfoRaw && typeof sectionInfoRaw === 'object' && 'title' in sectionInfoRaw
+  ? { title: String(sectionInfoRaw.title ?? type), subtitle: String(sectionInfoRaw.subtitle ?? ''), description: String(sectionInfoRaw.description ?? '') }
+  : { title: type.toUpperCase(), subtitle: '', description: '' };
 
 // 1. 獲取資料
 let posts: any[] = [];
 try {
-  // 注意: getPosts 內部已經處理了 Mock Data 邏輯 (當 DB 不存在時)
-  const dbPosts = await getPosts(Astro.locals.runtime?.env?.DB, type);
-  
-  // 解析 metadata 並整理格式
-  posts = dbPosts.map(post => {
-    const meta = JSON.parse(post.metadata || '{}');
-    return {
-      ...post,
-      ...meta,
-      date: new Date(post.created_at).toISOString(),
-      contentType: post.type
-    };
-  });
+  const dbPosts = await getPosts(Astro.locals?.runtime?.env?.DB ?? null, type);
+  const parseMeta = (post: { metadata?: string; created_at: number; type: string }) => {
+    try { return JSON.parse(post.metadata || '{}'); } catch { return {}; }
+  };
+  posts = dbPosts.map(post => ({
+    ...post,
+    ...parseMeta(post),
+    date: new Date(post.created_at).toISOString(),
+    contentType: post.type
+  }));
 } catch (e) {
   console.error(`Error fetching ${type}:`, e);
 }
 
-// 2. 簡單分頁 (未來可擴充)
-const postsCount = posts.length;
+const noDataText = typeof t?.common?.noData === 'string' ? t.common.noData : '沒有資料';
 ---
 
 <Layout title={`${sectionInfo.title} | THE BASE`}>
@@ -67,7 +67,7 @@ const postsCount = posts.length;
       {posts.length === 0 ? (
         <div class="bg-surface border-2 border-border p-8 text-center">
           <p class="text-text-muted font-mono">
-            {t.common.noData}
+            {noDataText}
           </p>
         </div>
       ) : (
@@ -76,11 +76,11 @@ const postsCount = posts.length;
             {posts.map((post) => (
               <div class="p-6">
                 <ArticleCard
-                  slug={post.slug}
-                  title={post.title}
-                  date={post.date}
-                  type={post.type.toUpperCase()}
-                  rank={post.rank || 'PVT'}
+                  slug={String(post.slug ?? '')}
+                  title={String(post.title ?? '')}
+                  date={String(post.date ?? '')}
+                  type={String(post.type ?? type).toUpperCase()}
+                  rank={typeof post.rank === 'string' ? post.rank : 'PVT'}
                   href={getLocalePath(currentLocale, `/${post.type}/${post.slug}`)}
                 />
               </div>

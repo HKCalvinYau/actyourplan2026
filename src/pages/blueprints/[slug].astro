@@ -7,7 +7,7 @@ const { slug } = Astro.params;
 const type = 'blueprints';
 
 // 獲取文章資料
-const post = await getPost(Astro.locals.runtime?.env?.DB, slug!);
+const post = await getPost(Astro.locals?.runtime?.env?.DB ?? null, slug!);
 
 if (!post) {
   return Astro.redirect('/404');

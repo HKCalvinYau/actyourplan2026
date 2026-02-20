@@ -2,32 +2,33 @@
 import Layout from '../../layouts/Layout.astro';
 import ArticleCard from '../../components/ArticleCard';
 import { getPosts } from '../../lib/d1';
-import { getTranslations, getLocalePath } from '../../lib/i18n';
+import { getTranslations, getLocalePath, defaultLocale } from '../../lib/i18n';
 
-// 獲取當前語言
-const currentLocale = Astro.locals.locale || 'zh-TW';
+// 確保 locale 為字串，避免 Cloudflare 上顯示 [object Object]
+const localeRaw = Astro.locals?.locale;
+const currentLocale = typeof localeRaw === 'string' ? localeRaw : defaultLocale;
 const t = getTranslations(currentLocale);
 
 // 1. 獲取資料
 let posts: any[] = [];
 try {
-  if (Astro.locals.runtime?.env?.DB) {
+  if (Astro.locals?.runtime?.env?.DB) {
     const dbPosts = await getPosts(Astro.locals.runtime.env.DB, 'blueprints');
-    
-    // 解析 metadata 並整理格式
-    posts = dbPosts.map(post => {
-      const meta = JSON.parse(post.metadata || '{}');
-      return {
-        ...post,
-        ...meta,
-        date: new Date(post.created_at).toISOString(),
-        contentType: post.type
-      };
-    });
+    const meta = (post: { metadata?: string; created_at: number; type: string }) => {
+      try { return JSON.parse(post.metadata || '{}'); } catch { return {}; }
+    };
+    posts = dbPosts.map(post => ({
+      ...post,
+      ...meta(post),
+      date: new Date(post.created_at).toISOString(),
+      contentType: post.type
+    }));
   }
 } catch (e) {
   console.error('Error fetching blueprints:', e);
 }
+
+const noDataText = typeof t?.common?.noData === 'string' ? t.common.noData : '沒有資料';
 ---
 
 <Layout title="Blueprints | THE BASE">
@@ -89,7 +90,7 @@ try {
       {posts.length === 0 ? (
         <div class="bg-surface border-2 border-border p-8 text-center">
           <p class="text-text-muted font-mono">
-            {t.common.noData}
+            {noDataText}
           </p>
         </div>
       ) : (
@@ -98,11 +99,11 @@ try {
             {posts.map((post) => (
               <div class="p-6">
                 <ArticleCard
-                  slug={post.slug}
-                  title={post.title}
-                  date={post.date}
+                  slug={String(post.slug ?? '')}
+                  title={String(post.title ?? '')}
+                  date={String(post.date ?? '')}
                   type="BLUEPRINTS"
-                  rank={post.rank || 'PVT'}
+                  rank={typeof post.rank === 'string' ? post.rank : 'PVT'}
                   href={getLocalePath(currentLocale, `/blueprints/${post.slug}`)}
                 />
               </div>
