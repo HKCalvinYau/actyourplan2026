@@ -24,6 +24,29 @@ export const translations = {
       experiments: 'E. EXPERIMENTS',
       lang: 'LANG:',
     },
+    // 頁面標題與描述
+    sections: {
+      blueprints: {
+        title: 'B. BLUEPRINTS',
+        subtitle: '戰略藍圖 - 解構經典書籍與商業模式',
+        description: '這裡不存放讀後感，只存放「可執行的代碼」。',
+      },
+      armory: {
+        title: 'A. ARMORY',
+        subtitle: '數位軍火庫 - 最強作戰工具集',
+        description: '精選的高效能工具與軟體，提升你的作戰效率。',
+      },
+      signals: {
+        title: 'S. SIGNALS',
+        subtitle: '情報訊號 - 市場趨勢與洞察',
+        description: '過濾雜訊，捕捉真正有價值的商業訊號。',
+      },
+      experiments: {
+        title: 'E. EXPERIMENTS',
+        subtitle: '戰術實驗 - 最小可行性測試',
+        description: '快速試錯的實驗室，記錄每一次假設與驗證。',
+      },
+    },
     // 首頁
     home: {
       hero: {
@@ -102,6 +125,28 @@ export const translations = {
       experiments: 'E. EXPERIMENTS',
       lang: 'LANG:',
     },
+    sections: {
+      blueprints: {
+        title: 'B. BLUEPRINTS',
+        subtitle: '战略蓝图 - 解构经典书籍与商业模式',
+        description: '这里不存放读后感，只存放「可执行的代码」。',
+      },
+      armory: {
+        title: 'A. ARMORY',
+        subtitle: '数字军火库 - 最强作战工具集',
+        description: '精选的高效能工具与软件，提升你的作战效率。',
+      },
+      signals: {
+        title: 'S. SIGNALS',
+        subtitle: '情报信号 - 市场趋势与洞察',
+        description: '过滤杂讯，捕捉真正有价值的商业信号。',
+      },
+      experiments: {
+        title: 'E. EXPERIMENTS',
+        subtitle: '战术实验 - 最小可行性测试',
+        description: '快速试错的实验室，记录每一次假设与验证。',
+      },
+    },
     home: {
       hero: {
         headline1: '建立你的基地。执行你的计划。',
@@ -177,6 +222,28 @@ export const translations = {
       experiments: 'E. EXPERIMENTS',
       lang: 'LANG:',
     },
+    sections: {
+      blueprints: {
+        title: 'B. BLUEPRINTS',
+        subtitle: 'Strategic Blueprints - Deconstructing Business Models',
+        description: 'No book reviews here, only "executable code".',
+      },
+      armory: {
+        title: 'A. ARMORY',
+        subtitle: 'Digital Armory - Best Tools & Resources',
+        description: 'Curated high-performance tools to boost your combat efficiency.',
+      },
+      signals: {
+        title: 'S. SIGNALS',
+        subtitle: 'Intelligence Signals - Market Trends & Insights',
+        description: 'Filtering noise to capture truly valuable business signals.',
+      },
+      experiments: {
+        title: 'E. EXPERIMENTS',
+        subtitle: 'Tactical Experiments - MVP Testing',
+        description: 'A lab for rapid trial and error, recording every hypothesis and validation.',
+      },
+    },
     home: {
       hero: {
         headline1: 'Build your base. Execute your plan.',
@@ -251,6 +318,28 @@ export const translations = {
       signals: 'S. SIGNALS',
       experiments: 'E. EXPERIMENTS',
       lang: 'LANG:',
+    },
+    sections: {
+      blueprints: {
+        title: 'B. BLUEPRINTS',
+        subtitle: '戦略の青写真 - ビジネスモデルの解体',
+        description: 'ここには読書感想文はありません。「実行可能なコード」のみです。',
+      },
+      armory: {
+        title: 'A. ARMORY',
+        subtitle: 'デジタル武器庫 - 最強のツール集',
+        description: '戦闘効率を高めるために厳選された高性能ツールとソフトウェア。',
+      },
+      signals: {
+        title: 'S. SIGNALS',
+        subtitle: '情報シグナル - 市場動向と洞察',
+        description: 'ノイズをフィルタリングし、真に価値のあるビジネスシグナルを捕捉します。',
+      },
+      experiments: {
+        title: 'E. EXPERIMENTS',
+        subtitle: '戦術実験 - MVPテスト',
+        description: '仮説と検証を記録する、迅速な試行錯誤のためのラボ。',
+      },
     },
     home: {
       hero: {

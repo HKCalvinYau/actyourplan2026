@@ -16,18 +16,23 @@ const {
   image = '/images/og-default.jpg'
 } = Astro.props;
 
-// Google Analytics ID (從環境變數讀取，如果沒有則留空)
-const gaId = import.meta.env.PUBLIC_GA_ID || '';
+// Google Analytics ID（確保為字串，避免 Cloudflare 上出現 [object Object]）
+const gaIdRaw = import.meta.env.PUBLIC_GA_ID;
+const gaId = typeof gaIdRaw === 'string' ? gaIdRaw : '';
+
+// 確保 locale 一定是字串（Cloudflare 環境下 locals 結構可能不同）
+const localeRaw = Astro.locals?.locale;
+const currentLocale = typeof localeRaw === 'string' ? localeRaw : 'zh-TW';
 ---
 
 <!doctype html>
-<html lang="zh-TW" class="scroll-smooth">
+<html lang={currentLocale} class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
+    <meta name="generator" content={typeof Astro.generator === 'string' ? Astro.generator : 'Astro'} />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -52,7 +57,7 @@ const gaId = import.meta.env.PUBLIC_GA_ID || '';
     <title>{title}</title>
   </head>
   <body class="bg-background text-text-main font-mono antialiased min-h-screen flex flex-col">
-    <Header client:load />
+    <Header client:load initialLocale={currentLocale} />
     
     <main class="flex-grow">
       <slot />

@@ -1,0 +1,76 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getPost } from '../../lib/d1';
+import { marked } from 'marked'; // 用於解析 Markdown
+
+const { slug } = Astro.params;
+const type = 'blueprints';
+
+// 獲取文章資料
+const post = await getPost(Astro.locals.runtime?.env?.DB, slug!);
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+// 解析 Metadata
+const meta = JSON.parse(post.metadata || '{}');
+const contentHtml = marked.parse(post.content);
+
+// 格式化日期
+const date = new Date(post.created_at).toLocaleDateString('zh-TW', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+});
+---
+
+<Layout title={`${post.title} | Blueprints`} description={post.title}>
+  <article class="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header -->
+      <header class="mb-12 border-b-2 border-primary pb-8">
+        <div class="flex flex-wrap items-center gap-4 mb-6 font-mono text-sm">
+          <span class="px-3 py-1 bg-primary/10 text-primary border border-primary uppercase tracking-wider">
+            TYPE: BLUEPRINTS
+          </span>
+          <span class="text-text-muted">
+            ID: {post.slug}
+          </span>
+          <span class="text-text-muted">
+            DATE: {date}
+          </span>
+          {meta.rank && (
+            <span class="ml-auto px-3 py-1 bg-surface border border-border text-text-main">
+              RANK: {meta.rank}
+            </span>
+          )}
+        </div>
+        
+        <h1 class="text-4xl md:text-5xl font-heading font-bold text-text-main mb-6 leading-tight">
+          {post.title}
+        </h1>
+
+        {/* Tags */}
+        {meta.tags && meta.tags.length > 0 && (
+          <div class="flex flex-wrap gap-2">
+            {meta.tags.map((tag: string) => (
+              <span class="text-xs font-mono text-primary">#{tag}</span>
+            ))}
+          </div>
+        )}
+      </header>
+
+      <!-- Content -->
+      <div class="prose prose-invert max-w-none font-mono" set:html={contentHtml} />
+
+      <!-- Footer -->
+      <footer class="mt-16 pt-8 border-t border-border flex justify-between items-center">
+        <a href="/blueprints" class="text-primary hover:underline font-mono text-sm uppercase">
+          &lt; RETURN TO BASE
+        </a>
+      </footer>
+    </div>
+  </article>
+</Layout>
+

@@ -1,11 +1,7 @@
-'use client'
-
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { Lock, LogOut } from 'lucide-react'
 
 export default function AuthButton() {
-  const router = useRouter()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [username, setUsername] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -17,12 +13,14 @@ export default function AuthButton() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/check')
-      if (response.ok) {
-        const data = await response.json()
-        setIsAuthenticated(data.authenticated)
-        setUsername(data.username)
-      }
+      // 這裡暫時先假裝沒登入，之後需要寫 Astro 的 API endpoint
+      // const response = await fetch('/api/auth/check')
+      // if (response.ok) {
+      //   const data = await response.json()
+      //   setIsAuthenticated(data.authenticated)
+      //   setUsername(data.username)
+      // }
+      setIsAuthenticated(false)
     } catch (error) {
       setIsAuthenticated(false)
     } finally {
@@ -32,11 +30,12 @@ export default function AuthButton() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' })
+      // await fetch('/api/auth/logout', { method: 'POST' })
       setIsAuthenticated(false)
       setUsername(null)
-      router.push('/')
-      router.refresh()
+      if (typeof window !== 'undefined') {
+        window.location.href = '/'
+      }
     } catch (error) {
       console.error('登出失敗:', error)
     }
@@ -60,7 +59,7 @@ export default function AuthButton() {
             ID: {username}
           </span>
           <a
-            href="/keystatic"
+            href="/admin" // 改成 Astro 的 admin 路徑
             className="flex items-center gap-2 px-4 py-2 border-2 border-primary bg-transparent text-primary font-mono text-sm uppercase tracking-wider hover:bg-primary hover:text-background transition-all duration-200"
           >
             <Lock className="w-4 h-4" />
@@ -80,7 +79,7 @@ export default function AuthButton() {
             ID: {username}
           </div>
           <a
-            href="/keystatic"
+            href="/admin"
             className="flex items-center gap-2 px-4 py-2 border-2 border-primary bg-transparent text-primary font-mono text-sm uppercase tracking-wider hover:bg-primary hover:text-background transition-all duration-200 w-fit"
           >
             <Lock className="w-4 h-4" />
@@ -100,7 +99,7 @@ export default function AuthButton() {
 
   return (
     <a
-      href="/login"
+      href="/admin" // 登入連結指向 admin
       className="flex items-center gap-2 px-4 py-2 border-2 border-primary bg-transparent text-primary font-mono text-sm uppercase tracking-wider hover:bg-primary hover:text-background transition-all duration-200"
     >
       <Lock className="w-4 h-4" />
@@ -108,4 +107,3 @@ export default function AuthButton() {
     </a>
   )
 }
-

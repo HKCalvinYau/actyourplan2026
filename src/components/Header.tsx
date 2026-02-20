@@ -1,19 +1,22 @@
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
-// import { usePathname } from 'next/navigation' // Astro 不支援
 import AuthButton from './AuthButton'
 import LanguageSwitcher from './LanguageSwitcher'
-import { getTranslations, getLocaleFromPath, getLocalePath } from '../lib/i18n' // 路徑調整
+import { getTranslations, getLocaleFromPath, getLocalePath, defaultLocale, type Locale } from '../lib/i18n'
 
-export default function Header() {
+interface HeaderProps {
+  initialLocale?: Locale
+}
+
+export default function Header({ initialLocale = defaultLocale }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [pathname, setPathname] = useState('/') // 改用 state
+  const [locale, setLocale] = useState<Locale>(initialLocale)
 
   useEffect(() => {
-    setPathname(window.location.pathname)
+    // 當 URL 變更時更新 locale (處理客戶端導航)
+    setLocale(getLocaleFromPath(window.location.pathname))
   }, [])
-
-  const locale = getLocaleFromPath(pathname)
+  
   const t = getTranslations(locale)
 
   const menuItems = [

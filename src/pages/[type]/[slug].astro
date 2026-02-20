@@ -1,0 +1,83 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getPost } from '../../lib/d1';
+import { marked } from 'marked';
+import { getLocalePath } from '../../lib/i18n';
+
+const { type, slug } = Astro.params;
+
+if (!type || !slug) {
+  return Astro.redirect('/404');
+}
+
+// 從 D1 (或 Mock) 獲取文章
+let post = null;
+try {
+  // 注意：本地開發可能沒有 Astro.locals.runtime.env.DB，getPost 內部會處理 Mock 邏輯
+  post = await getPost(Astro.locals.runtime?.env?.DB, slug);
+} catch (e) {
+  console.error('Error fetching post:', e);
+}
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+// 解析 Markdown
+const contentHtml = await marked(post.content);
+
+// 解析 Metadata
+const meta = JSON.parse(post.metadata || '{}');
+const tags = meta.tags || [];
+
+// 處理多語言
+const currentLocale = Astro.locals.locale || 'zh-TW';
+const date = new Date(post.created_at).toLocaleDateString(currentLocale, {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+// 類型標籤
+const typeLabel = type.toUpperCase();
+const backLink = getLocalePath(currentLocale, `/${type}`);
+---
+
+<Layout title={`${post.title} | THE BASE`} description={post.content.slice(0, 150) + '...'}>
+  <article class="min-h-screen bg-background pb-20">
+    <!-- Header -->
+    <header class="border-b border-border bg-surface py-12 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex items-center gap-4 mb-6 font-mono text-sm">
+          <a href={backLink} class="text-primary hover:underline uppercase">
+            &lt; {typeLabel}
+          </a>
+          <span class="text-text-muted">/</span>
+          <span class="text-text-muted">{date}</span>
+        </div>
+        
+        <h1 class="text-3xl md:text-5xl font-heading font-bold text-text-main mb-6 leading-tight">
+          {post.title}
+        </h1>
+
+        <div class="flex flex-wrap gap-3">
+          {meta.rank && (
+            <span class="px-3 py-1 bg-primary/10 border border-primary text-primary font-mono text-xs uppercase tracking-wider">
+            RANK: {meta.rank}
+            </span>
+          )}
+          {tags.map((tag: string) => (
+            <span class="px-3 py-1 bg-surface border border-border text-text-muted font-mono text-xs uppercase tracking-wider">
+              #{tag}
+            </span>
+          ))}
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="prose prose-invert max-w-none font-sans" set:html={contentHtml} />
+    </div>
+  </article>
+</Layout>

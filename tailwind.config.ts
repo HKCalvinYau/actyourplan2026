@@ -2,9 +2,7 @@ import type { Config } from 'tailwindcss'
 
 const config: Config = {
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}',
   ],
   theme: {
     extend: {
@@ -18,11 +16,12 @@ const config: Config = {
         border: '#262626',           // 邊框顏色
       },
       fontFamily: {
-        // 標題使用 Inter (Bold, Uppercase)
+        // 預設無襯線字體 (Inter) - 用於標題和內文
+        sans: ['var(--font-inter)', 'sans-serif'],
         heading: ['var(--font-inter)', 'sans-serif'],
-        // 內文和程式碼使用 JetBrains Mono (等寬字體，像終端機)
+        
+        // 等寬字體 (JetBrains Mono) - 僅用於數據、代碼、戰術標籤
         mono: ['var(--font-jetbrains-mono)', 'monospace'],
-        body: ['var(--font-jetbrains-mono)', 'monospace'],
       },
       backgroundImage: {
         // 網格線背景效果
@@ -39,4 +38,3 @@ const config: Config = {
   plugins: [],
 }
 export default config
-

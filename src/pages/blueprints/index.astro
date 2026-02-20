@@ -1,8 +1,12 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ArticleCard from '../../components/ArticleCard';
-import Pagination from '../../components/Pagination'; // 需要確認 Pagination 是否相容
-import { getPosts, type Post } from '../../lib/d1';
+import { getPosts } from '../../lib/d1';
+import { getTranslations, getLocalePath } from '../../lib/i18n';
+
+// 獲取當前語言
+const currentLocale = Astro.locals.locale || 'zh-TW';
+const t = getTranslations(currentLocale);
 
 // 1. 獲取資料
 let posts: any[] = [];
@@ -24,10 +28,6 @@ try {
 } catch (e) {
   console.error('Error fetching blueprints:', e);
 }
-
-// 2. 分頁處理 (簡單版)
-const currentPage = 1; // 暫時寫死，進階分頁需要處理 URLSearchParams
-const totalPages = 1;
 ---
 
 <Layout title="Blueprints | THE BASE">
@@ -89,7 +89,7 @@ const totalPages = 1;
       {posts.length === 0 ? (
         <div class="bg-surface border-2 border-border p-8 text-center">
           <p class="text-text-muted font-mono">
-            目前沒有文章
+            {t.common.noData}
           </p>
         </div>
       ) : (
@@ -103,7 +103,7 @@ const totalPages = 1;
                   date={post.date}
                   type="BLUEPRINTS"
                   rank={post.rank || 'PVT'}
-                  href={`/blueprints/${post.slug}`}
+                  href={getLocalePath(currentLocale, `/blueprints/${post.slug}`)}
                 />
               </div>
             ))}
@@ -113,4 +113,3 @@ const totalPages = 1;
     </div>
   </div>
 </Layout>
-

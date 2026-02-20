@@ -2,9 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 引入字體 */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+/* 引入字體：已移至 Layout.astro 使用 <link> 標籤引入，提升效能 */
 
 /* 程式碼高亮樣式（深色主題） */
 .hljs {
@@ -42,7 +40,8 @@
   }
   
   body {
-    @apply bg-background text-text-main font-body;
+    /* 修正：使用 font-sans (Inter) 作為預設字體，還原設計稿質感 */
+    @apply bg-background text-text-main font-sans;
     /* 網格線背景效果 */
     background-image: 
       linear-gradient(to right, rgba(34, 197, 94, 0.03) 1px, transparent 1px),
@@ -313,6 +312,7 @@
 .marquee-container {
   overflow: hidden;
   white-space: nowrap;
+  position: relative;
 }
 
 .marquee-content {
@@ -320,4 +320,3 @@
   gap: 2rem;
   animation: marquee 20s linear infinite;
 }
-

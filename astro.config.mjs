@@ -15,7 +15,9 @@ export default defineConfig({
   }),
   integrations: [
     tailwind({
-      applyBaseStyles: false, // 我們會自己匯入 globals.css
+      // 修正：移除 applyBaseStyles: false，讓 Astro 自動注入 Tailwind 基礎樣式
+      // 這能確保即使 globals.css 載入有問題，Tailwind 的 class 依然能運作
+      // applyBaseStyles: false, 
     }),
     react(),
   ],

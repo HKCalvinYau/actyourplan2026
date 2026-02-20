@@ -8,7 +8,7 @@ import { getPosts, type Post } from '../lib/d1';
 let latestPosts: any[] = [];
 try {
   // 注意：本地開發時可能還沒連到 D1，這裡做個防護
-  if (Astro.locals.runtime?.env?.DB) {
+  if (Astro.locals?.runtime?.env?.DB) {
     // 獲取所有類型的文章，然後混合排序
     const types = ['blueprints', 'armory', 'signals', 'experiments'];
     let allPosts: Post[] = [];
@@ -134,11 +134,11 @@ const getTypeLabel = (contentType: string) => {
           <div class="space-y-3">
             {latestPosts.map((post) => (
               <ArticleCard
-                slug={post.slug}
-                title={post.title}
-                date={post.date}
+                slug={String(post.slug ?? '')}
+                title={String(post.title ?? '')}
+                date={String(post.date ?? '')}
                 type={getTypeLabel(post.contentType)}
-                rank={post.rank || 'PVT'}
+                rank={typeof post.rank === 'string' ? post.rank : 'PVT'}
                 href={`/${post.contentType}/${post.slug}`}
               />
             ))}
