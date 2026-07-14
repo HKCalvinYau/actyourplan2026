@@ -4,14 +4,11 @@
  * 獲取 CDN URL
  * 如果配置了 CDN，則使用 CDN；否則使用原始路徑
  */
-export function getCDNUrl(path: string): string {
+export function getCDNUrl(path: string, cdnBaseUrl?: string): string {
   // 如果是完整 URL，直接返回
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path
   }
-
-  // 從環境變數獲取 CDN 基礎 URL
-  const cdnBaseUrl = process.env.NEXT_PUBLIC_CDN_URL
 
   // 如果配置了 CDN，使用 CDN URL
   if (cdnBaseUrl) {
@@ -36,7 +33,10 @@ export function getOptimizedImageUrl(
     height?: number
     quality?: number
     format?: 'webp' | 'avif' | 'jpeg' | 'png'
-  }
+  },
+  cloudflareAccountId?: string,
+  cloudflareImagesHash?: string,
+  cdnBaseUrl?: string
 ): string {
   const { width, height, quality = 80, format } = options || {}
 
@@ -46,9 +46,6 @@ export function getOptimizedImageUrl(
   }
 
   // Cloudflare Images CDN
-  const cloudflareAccountId = process.env.NEXT_PUBLIC_CLOUDFLARE_ACCOUNT_ID
-  const cloudflareImagesHash = process.env.NEXT_PUBLIC_CLOUDFLARE_IMAGES_HASH
-
   if (cloudflareAccountId && cloudflareImagesHash) {
     const normalizedPath = path.startsWith('/') ? path.slice(1) : path
     let url = `https://imagedelivery.net/${cloudflareImagesHash}/${normalizedPath}`
@@ -68,7 +65,6 @@ export function getOptimizedImageUrl(
   }
 
   // 使用自定義 CDN
-  const cdnBaseUrl = process.env.NEXT_PUBLIC_CDN_URL
   if (cdnBaseUrl) {
     const normalizedPath = path.startsWith('/') ? path : `/${path}`
     const baseUrl = cdnBaseUrl.replace(/\/$/, '')
@@ -97,13 +93,14 @@ export function getOptimizedImageUrl(
  */
 export function generateSrcSet(
   path: string,
-  widths: number[] = [640, 750, 828, 1080, 1200, 1920, 2048, 3840]
+  widths: number[] = [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+  cloudflareAccountId?: string,
+  cloudflareImagesHash?: string
 ): string {
   return widths
     .map((width) => {
-      const url = getOptimizedImageUrl(path, { width, format: 'webp' })
+      const url = getOptimizedImageUrl(path, { width, format: 'webp' }, cloudflareAccountId, cloudflareImagesHash)
       return `${url} ${width}w`
     })
     .join(', ')
 }
-

@@ -1,7 +1,7 @@
 // import Image from 'next/image' // Astro 不使用 next/image
 import { useState } from 'react'
 import { ImageOff } from 'lucide-react'
-import { getOptimizedImageUrl } from '../lib/image-cdn' 
+ 
 
 interface TacticalImageProps {
   src: string

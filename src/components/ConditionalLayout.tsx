@@ -20,9 +20,8 @@ export default function ConditionalLayout({
     if (typeof window !== 'undefined') setClientPathname(window.location.pathname)
   }, [])
 
-  const isKeystatic = pathname.startsWith('/keystatic')
   const isLogin = pathname === '/login'
-  const showChrome = !isKeystatic && !isLogin
+  const showChrome = !isLogin
 
   return (
     <>

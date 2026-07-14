@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { 
-  LayoutDashboard, 
+ 
   FileText, 
   Image as ImageIcon, 
   LogOut, 
   Plus, 
   Save, 
   Trash2, 
-  X, 
-  Search,
+ 
   ChevronLeft,
   Eye,
   EyeOff,

@@ -38,7 +38,7 @@ const rankConfig = {
 }
 
 export default function ArticleCard({
-  slug,
+  slug: _,
   title,
   date,
   type,

@@ -4,7 +4,6 @@ import { getPost } from '../../lib/d1';
 import { marked } from 'marked'; // 用於解析 Markdown
 
 const { slug } = Astro.params;
-const type = 'blueprints';
 
 // 獲取文章資料
 const post = await getPost(Astro.locals?.runtime?.env?.DB ?? null, slug!);

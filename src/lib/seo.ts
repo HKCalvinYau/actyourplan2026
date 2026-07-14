@@ -1,9 +1,8 @@
 // SEO 相關工具函數
 
-import type { Metadata } from 'next'
-import { Locale, defaultLocale } from './i18n'
+import type { Locale } from './i18n'
 
-export interface SEOConfig {
+interface SEOConfig {
   title: string
   description: string
   keywords?: string[]
@@ -14,7 +13,22 @@ export interface SEOConfig {
   alternateLocales?: Locale[]
 }
 
-export function generateMetadata(config: SEOConfig): Metadata {
+interface GeneratedMetadata {
+  title?: string
+  description?: string
+  keywords?: string
+  authors?: { name: string }[]
+  creator?: string
+  publisher?: string
+  formatDetection?: { email?: boolean; address?: boolean; telephone?: boolean }
+  metadataBase?: URL
+  alternates?: { canonical?: string; languages?: Record<string, string> }
+  openGraph?: Record<string, any>
+  twitter?: Record<string, any>
+  robots?: Record<string, any>
+}
+
+export function generateMetadata(config: SEOConfig): GeneratedMetadata {
   const {
     title,
     description,
@@ -22,7 +36,7 @@ export function generateMetadata(config: SEOConfig): Metadata {
     image = '/images/og-image.jpg',
     url = 'https://actyourplan.com',
     type = 'website',
-    locale = defaultLocale,
+    locale = 'zh-TW' as Locale,
     alternateLocales = [],
   } = config
 
@@ -66,7 +80,7 @@ export function generateMetadata(config: SEOConfig): Metadata {
         },
       ],
       locale: locale === 'zh-TW' ? 'zh_TW' : locale === 'zh-CN' ? 'zh_CN' : locale,
-      alternateLocale: alternateLocales.map(loc => 
+      alternateLocale: alternateLocales.map(loc =>
         loc === 'zh-TW' ? 'zh_TW' : loc === 'zh-CN' ? 'zh_CN' : loc
       ),
     },
@@ -117,7 +131,7 @@ export function generateStructuredData(config: {
     author,
   } = config
 
-  const baseData: any = {
+  const baseData: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': type,
     name,
@@ -148,4 +162,3 @@ export function generateStructuredData(config: {
 
   return baseData
 }
-

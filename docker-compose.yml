@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - CLOUDFLARE_ACCOUNT_ID=${CLOUDFLARE_ACCOUNT_ID}
+      - D1_DATABASE_ID=${D1_DATABASE_ID}
+      - R2_BUCKET=${R2_BUCKET}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+    volumes:
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+
+volumes:
+  uploads:
